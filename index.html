@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Generador de Mensajes - Impresión 3D</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .output-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e7f3ff;
+            border: 1px solid #b2d7ff;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+
+        button {
+            background: #25d366;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #128c7e;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>🚀 Actualización de Pedido 3D</h2>
+
+        <label>Título del Pedido:</label>
+        <input type="text" id="titulo" placeholder="Ej: Figura Kratos Articulada">
+
+        <label>Proceso Actual:</label>
+        <select id="proceso">
+            <optgroup label="Diseño y Modelado">
+                <option>Diseño de referencias fotográficas</option>
+                <option>Personalización con el cliente</option>
+                <option>Modelado prototipo 3D</option>
+                <option>Consultas al cliente para personalizar prototipo</option>
+                <option>Modelado intermedio 3D</option>
+                <option>Modelado de finalización 3D</option>
+            </optgroup>
+            <optgroup label="Preparación e Impresión">
+                <option>Corte de la figura 3D</option>
+                <option>Configuración de la impresora 3D</option>
+                <option>Impresión de la figura 3D</option>
+                <option>Impresión de las uniones 3D</option>
+            </optgroup>
+            <optgroup label="Post-procesado">
+                <option>Solución de detalles y calidad</option>
+                <option>Primer para adhesión de acrílico</option>
+                <option>Secado de la pieza</option>
+                <option>Lijado de las piezas</option>
+                <option>Pintura: primeras capas</option>
+                <option>Pintura: acabado intermedio</option>
+                <option>Pintura: acabado abrillantador</option>
+                <option>Sellado de barniz</option>
+            </optgroup>
+            <optgroup label="Logística">
+                <option>Listo para embalar</option>
+                <option>Embalado</option>
+                <option>Listo para Enviar</option>
+                <option>Enviado</option>
+            </optgroup>
+        </select>
+
+        <label>Estado del Tiempo:</label>
+        <select id="estado">
+            <option value="✅ A tiempo">A tiempo</option>
+            <option value="⚠️ Con leve retraso">Con leve retraso</option>
+            <option value="🚨 Retrasado">Retrasado</option>
+            <option value="📦 Devolución">Devolución</option>
+        </select>
+
+        <label>Dimensiones (cm):</label>
+        <div style="display: flex; gap: 10px;">
+            <input type="number" id="alto" placeholder="Alto (cm)" min="0">
+            <input type="number" id="ancho" placeholder="Ancho (cm)" min="0">
+            <input type="number" id="profundidad" placeholder="Profundidad (cm)" min="0">
+        </div>
+
+        <label>Cantidad:</label>
+        <input type="number" id="cantidad" value="1">
+
+        <p><strong>Volumen Total del Pedido:</strong> <span id="volumenTotal">0</span> cm³</p>
+
+
+        <div style="display: flex; gap: 10px;">
+            <div style="flex: 1;">
+                <label>Abono:</label>
+                <input type="text" id="abono" placeholder="$0.00">
+            </div>
+            <div style="flex: 1;">
+                <label>Total:</label>
+                <input type="text" id="total" placeholder="$0.00">
+            </div>
+        </div>
+
+        <label>Fecha de Entrega Estimada:</label>
+        <input type="date" id="fechaEntrega">
+
+        <hr style="margin:20px 0;">
+
+        <h3>➕ Costos Adicionales</h3>
+
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="ideaNombre" placeholder="Ej: Base estilo madera">
+            <input type="number" id="ideaPrecio" placeholder="Precio" min="0">
+        </div>
+
+        <button type="button" style="background:#6c757d;" onclick="agregarCosto()">Agregar Idea</button>
+
+        <ul id="listaCostos"></ul>
+
+        <strong>Nuevo Monto Total: </strong>
+        <span id="nuevoTotal">$0</span>
+
+
+        <button onclick="generarMensaje()">Generar Mensaje</button>
+
+        <div class="output-box" id="resultado">El mensaje aparecerá aquí...</div>
+        <button id="btnCopiar" style="display:none; background: #007bff;" onclick="copiarAlPortapapeles()">Copiar al
+            Portapapeles</button>
+    </div>
+
+    <script>
+        const despedidas = [
+            "Gracias por tu paciencia 😊 Estamos trabajando con cuidado en cada detalle para que el resultado final quede increíble.",
+            "Seguimos avanzando paso a paso 💪 Cualquier cosa que se te ocurra ajustar, lo vemos sin problema.",
+            "Vamos muy bien con el proceso 👌 Ante cualquier duda, aquí estoy para ayudarte.",
+            "Todo sigue según lo planificado ✨ Te iré avisando cualquier novedad.",
+            "Gracias por la confianza 🙌 Seguimos trabajando para que el resultado final te encante."
+        ];
+
+        let costosAdicionales = [];
+
+        function obtenerDespedida() {
+            let indice = localStorage.getItem("despedidaIndex");
+            indice = indice ? parseInt(indice) : 0;
+
+            const mensaje = despedidas[indice];
+            localStorage.setItem("despedidaIndex", (indice + 1) % despedidas.length);
+
+            return mensaje;
+        }
+
+        function agregarCosto() {
+            const nombre = document.getElementById("ideaNombre").value;
+            const precio = parseFloat(document.getElementById("ideaPrecio").value);
+
+            if (!nombre || isNaN(precio)) return;
+
+            costosAdicionales.push({ nombre, precio });
+
+            document.getElementById("ideaNombre").value = "";
+            document.getElementById("ideaPrecio").value = "";
+
+            renderizarCostos();
+        }
+
+        function renderizarCostos() {
+            const lista = document.getElementById("listaCostos");
+            lista.innerHTML = "";
+
+            let suma = 0;
+
+            costosAdicionales.forEach(item => {
+                suma += item.precio;
+                const li = document.createElement("li");
+                li.textContent = `${item.nombre}: $${item.precio.toLocaleString()}`;
+                lista.appendChild(li);
+            });
+
+            const totalBase = parseFloat(
+                document.getElementById("total").value.replace(/[^0-9]/g, "")
+            ) || 0;
+
+            const nuevoTotal = totalBase + suma;
+            document.getElementById("nuevoTotal").innerText = `$${nuevoTotal.toLocaleString()}`;
+        }
+
+        function generarMensaje() {
+            const alto = document.getElementById('alto').value;
+            const ancho = document.getElementById('ancho').value;
+            const profundidad = document.getElementById('profundidad').value;
+            const volumen = calcularVolumen();
+
+            const titulo = document.getElementById('titulo').value;
+            const proceso = document.getElementById('proceso').value;
+            const estado = document.getElementById('estado').value;
+            const abono = document.getElementById('abono').value;
+            const total = document.getElementById('total').value;
+            const cantidad = document.getElementById('cantidad').value;
+            const fechaEntrega = document.getElementById('fechaEntrega').value || "Por confirmar";
+            const hoy = new Date().toLocaleDateString();
+
+            let extrasTexto = "";
+            let extrasTotal = 0;
+
+            if (costosAdicionales.length > 0) {
+                extrasTexto = "\n➕ *Costos Adicionales:*\n";
+                costosAdicionales.forEach(item => {
+                    extrasTexto += `• ${item.nombre}: $${item.precio.toLocaleString()}\n`;
+                    extrasTotal += item.precio;
+                });
+            }
+
+            const totalBase = parseFloat(total.replace(/[^0-9]/g, "")) || 0;
+            const nuevoTotal = totalBase + extrasTotal;
+
+            const despedida = obtenerDespedida();
+
+            const mensaje =
+                `*ACTUALIZACIÓN DE TU PEDIDO 3D* 🛠️\n\n` +
+                `*Pedido:* ${titulo}\n` +
+                `*----------------------------------*\n` +
+                `⚙️ *PROCESO:* ${proceso}\n` +
+                `🚦 *ESTADO:* ${estado}\n\n` +
+                `📐 *Dimensiones:* ${alto} × ${ancho} × ${profundidad} cm\n` +
+                `📦 *Volumen Total:* ${volumen.toLocaleString()} cm³\n` +
+                `🔢 *Cantidad:* ${cantidad}\n` +
+                `💰 *Abono:* ${abono} / *Total Base:* ${total}\n` +
+                `${extrasTexto}\n` +
+                `💵 *Nuevo Monto Total:* $${nuevoTotal.toLocaleString()}\n\n` +
+                `📅 *Fecha Actualización:* ${hoy}\n` +
+                `🚚 *Entrega Estimada:* ${fechaEntrega}\n\n` +
+                `${despedida}`;
+
+            document.getElementById('resultado').innerText = mensaje;
+            document.getElementById('btnCopiar').style.display = 'block';
+        }
+
+
+        function copiarAlPortapapeles() {
+            navigator.clipboard.writeText(
+                document.getElementById('resultado').innerText
+            ).then(() => alert("¡Mensaje copiado!"));
+        }
+
+        function calcularVolumen() {
+            const alto = parseFloat(document.getElementById("alto").value) || 0;
+            const ancho = parseFloat(document.getElementById("ancho").value) || 0;
+            const profundidad = parseFloat(document.getElementById("profundidad").value) || 0;
+            const cantidad = parseInt(document.getElementById("cantidad").value) || 1;
+
+            const volumen = alto * ancho * profundidad * cantidad;
+            document.getElementById("volumenTotal").innerText = volumen.toLocaleString();
+
+            return volumen;
+        }
+
+        ["alto", "ancho", "profundidad", "cantidad"].forEach(id => {
+            document.getElementById(id).addEventListener("input", calcularVolumen);
+        });
+
+
+    </script>
+
+
+</body>
+
+</html>
